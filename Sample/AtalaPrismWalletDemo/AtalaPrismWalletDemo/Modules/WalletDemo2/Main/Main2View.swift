@@ -6,12 +6,14 @@ protocol Main2ViewRouter {
     associatedtype ConnectionsV: View
     associatedtype MessagesV: View
     associatedtype CredentialsV: View
+    associatedtype SettingsV: View
 
     func routeToMediator() -> MediatorV
     func routeToDids() -> DidsV
     func routeToConnections() -> ConnectionsV
     func routeToMessages() -> MessagesV
     func routeToCredentials() -> CredentialsV
+    func routeToSettings() -> SettingsV
 }
 
 struct Main2View<Router: Main2ViewRouter>: View {
@@ -19,16 +21,6 @@ struct Main2View<Router: Main2ViewRouter>: View {
 
     var body: some View {
         TabView {
-            router.routeToMediator()
-                .tabItem {
-                    Text("Mediator")
-                }
-
-            router.routeToDids()
-                .tabItem {
-                    Text("DID")
-                }
-
             router.routeToConnections()
                 .tabItem {
                     Text("Connections")
@@ -42,6 +34,11 @@ struct Main2View<Router: Main2ViewRouter>: View {
             router.routeToCredentials()
                 .tabItem {
                     Text("Credentials")
+                }
+
+            router.routeToSettings()
+                .tabItem {
+                    Text("Settings")
                 }
         }
     }

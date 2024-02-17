@@ -15,40 +15,38 @@ struct MediatorPageView<ViewModel: MediatorPageViewModel>: View {
     @State var didInput = "did:peer:2.Ez6LSghwSE437wnDE1pt3X6hVDUQzSjsHzinpX3XFvMjRAm7y.Vz6Mkhh1e5CEYYq6JBUcTZ6Cp2ranCWRrv7Yax3Le4N59R6dd.SeyJ0IjoiZG0iLCJzIjp7InVyaSI6Imh0dHBzOi8vc2l0LXByaXNtLW1lZGlhdG9yLmF0YWxhcHJpc20uaW8iLCJhIjpbImRpZGNvbW0vdjIiXX19.SeyJ0IjoiZG0iLCJzIjp7InVyaSI6IndzczovL3NpdC1wcmlzbS1tZWRpYXRvci5hdGFsYXByaXNtLmlvL3dzIiwiYSI6WyJkaWRjb21tL3YyIl19fQ"
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                if let mediator = viewModel.mediator {
-                    VStack(spacing: 16) {
-                        Text("Mediator DID:")
-                        Text(mediator.mediatorDID)
-                        Text("Routing DID:")
-                        Text(mediator.routingDID)
-                        Text("State of agent: \(viewModel.agentRunning ? "Running" : "Stoped")")
-                        Button {
-                            if viewModel.agentRunning {
-                                viewModel.stopAgent()
-                            } else {
-                                viewModel.startAgent(mediatorDID: mediator.mediatorDID)
-                            }
-                        } label: {
-                            Text(viewModel.agentRunning ? "Stop" : "Start")
+        VStack {
+            if let mediator = viewModel.mediator {
+                VStack(spacing: 16) {
+                    Text("Mediator DID:")
+                    Text(mediator.mediatorDID)
+                    Text("Routing DID:")
+                    Text(mediator.routingDID)
+                    Text("State of agent: \(viewModel.agentRunning ? "Running" : "Stoped")")
+                    Button {
+                        if viewModel.agentRunning {
+                            viewModel.stopAgent()
+                        } else {
+                            viewModel.startAgent(mediatorDID: mediator.mediatorDID)
                         }
-                        .disabled(viewModel.loading)
-                    }
-                } else {
-                    VStack(spacing: 16) {
-                        TextField("Mediator DID", text: $didInput)
-                        Button {
-                            viewModel.startAgent(mediatorDID: didInput)
-                        } label: {
-                            Text("Start")
-                        }
+                    } label: {
+                        Text(viewModel.agentRunning ? "Stop" : "Start")
                     }
                     .disabled(viewModel.loading)
                 }
+            } else {
+                VStack(spacing: 16) {
+                    TextField("Mediator DID", text: $didInput)
+                    Button {
+                        viewModel.startAgent(mediatorDID: didInput)
+                    } label: {
+                        Text("Start")
+                    }
+                }
+                .disabled(viewModel.loading)
             }
-            .padding()
-            .toastView(toast: $viewModel.error)
         }
+        .padding()
+        .toastView(toast: $viewModel.error)
     }
 }

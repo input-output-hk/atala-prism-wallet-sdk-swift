@@ -9,42 +9,47 @@ struct CredentialDetailView<ViewModel: CredentialDetailViewModel>: View {
     @StateObject var viewModel: ViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Issuer:")
-                    .font(.title2)
-                Text(viewModel.credential.issuer)
-                    .lineLimit(nil)
-            }
-            
-            if let id = viewModel.credential.credentialDefinitionId {
+        VStack {
+            VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Text("Credential Definition ID:")
+                    Text("Issuer: ")
                         .font(.title2)
-                    Text(id)
-                        .lineLimit(nil)
+                    Text(viewModel.credential.issuer)
+                        .lineLimit(3)
+                        .truncationMode(.middle)
+                }
+
+                if let id = viewModel.credential.credentialDefinitionId {
+                    HStack {
+                        Text("Credential Definition ID: ")
+                            .font(.title2)
+                        Text(id)
+                            .lineLimit(3)
+                            .truncationMode(.middle)
+                    }
+                }
+                if let id = viewModel.credential.schemaId {
+                    HStack {
+                        Text("Schema ID:")
+                            .font(.title2)
+                        Text(id)
+                            .lineLimit(3)
+                            .truncationMode(.middle)
+                    }
                 }
             }
-            if let id = viewModel.credential.schemaId {
-                HStack {
-                    Text("Schema ID:")
-                        .font(.title2)
-                    Text(id)
-                        .lineLimit(nil)
+            .padding()
+
+            List {
+                Section("Claims") {
+                    ForEach(viewModel.credential.claims.sorted(by: >), id: \.key) { key, value in
+                        Text("\(key): \(value)")
+                            .lineLimit(3)
+                            .truncationMode(.middle)
+                    }
                 }
             }
-            Text("Claims")
-                .font(.title2)
-            VStack(spacing: 8) {
-                ForEach(viewModel.credential.claims.sorted(by: >), id: \.key) { key, value in
-                    Text("\(key) - \(value)")
-                }
-            }
-            .padding(.leading)
-            
-            Spacer()
         }
-        .padding()
     }
 }
 

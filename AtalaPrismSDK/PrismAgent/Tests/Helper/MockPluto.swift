@@ -8,6 +8,7 @@ class MockPluto: Pluto {
     var credentials = [StorableCredential]()
     var messages = [Message]()
     var mediators = [(peer: Domain.DID, routingDID: Domain.DID, mediatorDID: Domain.DID)]()
+    var linkSecret: String?
 
     func storePrismDID(did: Domain.DID, keyPairIndex: Int, alias: String?) -> AnyPublisher<Void, Error> {
         Just(()).tryMap { $0 }.eraseToAnyPublisher()
@@ -49,6 +50,7 @@ class MockPluto: Pluto {
     }
 
     func storeLinkSecret(secret: StorableKey) -> AnyPublisher<Void, Error> {
+        linkSecret = "linkSecretMock"
         return Just(()).tryMap { $0 }.eraseToAnyPublisher()
     }
 
@@ -173,6 +175,13 @@ class MockPluto: Pluto {
     }
 
     func getLinkSecret() -> AnyPublisher<StorableKey?, Error> {
-        return Just(nil).tryMap { $0 }.eraseToAnyPublisher()
+        return Just(MockStorableKey()).tryMap { $0 }.eraseToAnyPublisher()
     }
+}
+
+private struct MockStorableKey: StorableKey {
+    var identifier = "linkSecretMock"
+    var restorationIdentifier = "linkSecret"
+    var storableData = "linkSecretMock".data(using: .utf8)!
+    var index: Int? = nil
 }
