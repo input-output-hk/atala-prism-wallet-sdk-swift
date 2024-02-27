@@ -1,6 +1,6 @@
 {
   "name": "atala-prism-wallet-sdk-swift",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "atala-prism-wallet-sdk-swift",
   "directories": {
     "example": "examples"

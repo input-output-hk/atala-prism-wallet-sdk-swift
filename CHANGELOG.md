@@ -1,3 +1,18 @@
+# [5.0.0](https://github.com/input-output-hk/atala-prism-wallet-sdk-swift/compare/4.0.1...5.0.0) (2024-02-27)
+
+
+### Bug Fixes
+
+* schema download optional ([#116](https://github.com/input-output-hk/atala-prism-wallet-sdk-swift/issues/116)) ([37655c1](https://github.com/input-output-hk/atala-prism-wallet-sdk-swift/commit/37655c1fbc200df88247aeab0ab4209c6d496b32))
+
+
+* feat!: move to swift based framework for didcomm, jose and peer did (#120) ([558164f](https://github.com/input-output-hk/atala-prism-wallet-sdk-swift/commit/558164f119881da4bd2edbfede40fb1760c84611)), closes [#120](https://github.com/input-output-hk/atala-prism-wallet-sdk-swift/issues/120)
+
+
+### BREAKING CHANGES
+
+* There is an update to the public API that is used directly with DIDComm
+
 # [4.0.0](https://github.com/input-output-hk/atala-prism-wallet-sdk-swift/compare/3.6.0...4.0.0) (2024-01-25)
 
 
