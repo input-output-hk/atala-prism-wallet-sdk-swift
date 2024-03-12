@@ -57,10 +57,10 @@ let package = Package(
         ),
         .package(url: "git@github.com:apple/swift-protobuf.git", from: "1.7.0"),
         .package(url: "https://github.com/beatt83/didcomm-swift.git", from: "0.1.1"),
-        .package(url: "https://github.com/beatt83/jose-swift.git", from: "1.2.1"),
+        .package(url: "https://github.com/beatt83/jose-swift.git", from: "1.2.2"),
         .package(url: "https://github.com/beatt83/peerdid-swift.git", from: "2.0.2"),
         .package(url: "https://github.com/input-output-hk/anoncreds-rs.git", exact: "0.4.1"),
-        .package(url: "https://github.com/input-output-hk/atala-prism-apollo.git", exact: "1.2.10"),
+        .package(url: "https://github.com/input-output-hk/atala-prism-apollo.git", exact: "1.2.11"),
     ],
     targets: [
         .target(
@@ -163,6 +163,7 @@ let package = Package(
             dependencies: [
                 "Domain",
                 "Builders",
+                "jose-swift",
                 "Core"
             ],
             path: "AtalaPrismSDK/PrismAgent/Sources"

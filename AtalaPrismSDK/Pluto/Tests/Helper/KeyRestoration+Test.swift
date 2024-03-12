@@ -25,4 +25,8 @@ struct MockKeyRestoration: KeyRestoration {
     func restoreKey(_ key: StorableKey) async throws -> Key {
         MockPublicKey(raw: key.storableData)
     }
+
+    func restoreKey(_ key: JWK, index: Int?) async throws -> Key {
+        MockPublicKey(raw: Data())
+    }
 }

@@ -28,25 +28,30 @@ public protocol KeyRestoration {
 
     /// Restores a private key from the given data.
     /// - Parameters:
-    ///   - identifier: An optional string used to identify the key.
-    ///   - data: The raw data representing the key.
+    ///   - key: A storableKey instance.
     /// - Throws: If the restoration process fails, this method throws an error.
     /// - Returns: The restored `PrivateKey` instance.
     func restorePrivateKey(_ key: StorableKey) async throws -> PrivateKey
 
     /// Restores a public key from the given data.
     /// - Parameters:
-    ///   - identifier: An optional string used to identify the key.
-    ///   - data: The raw data representing the key.
+    ///   - key: A storableKey instance.
     /// - Throws: If the restoration process fails, this method throws an error.
     /// - Returns: The restored `PublicKey` instance.
     func restorePublicKey(_ key: StorableKey) async throws -> PublicKey
 
     /// Restores a key from the given data.
     /// - Parameters:
-    ///   - identifier: An optional string used to identify the key.
-    ///   - data: The raw data representing the key.
+    ///   - key: A storableKey instance.
     /// - Throws: If the restoration process fails, this method throws an error.
     /// - Returns: The restored `Key` instance.
     func restoreKey(_ key: StorableKey) async throws -> Key
+
+    /// Restores a key from a JWK.
+    /// - Parameters:
+    ///   - key: A JWK instance.
+    ///   - index: An Int for the derivation index path.
+    /// - Throws: If the restoration process fails, this method throws an error.
+    /// - Returns: The restored `Key` instance.
+    func restoreKey(_ key: JWK, index: Int?) async throws -> Key
 }

@@ -3,7 +3,7 @@ import Foundation
 /// The `Message` struct represents a DIDComm message, which is used for secure, decentralized communication in the Atala PRISM architecture. A `Message` object includes information about the sender, recipient, message body, and other metadata. `Message` objects are typically exchanged between DID controllers using the `Mercury` building block.
 public struct Message: Identifiable, Hashable {
     /// The direction of the message (sent or received).
-    public enum Direction: String {
+    public enum Direction: String, Codable {
         case sent
         case received
     }

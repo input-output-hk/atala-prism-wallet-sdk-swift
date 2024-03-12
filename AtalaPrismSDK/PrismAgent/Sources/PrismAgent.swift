@@ -35,7 +35,7 @@ public class PrismAgent {
     let apollo: Apollo & KeyRestoration
     let castor: Castor
     let pluto: Pluto
-    let pollux: Pollux
+    let pollux: Pollux & CredentialImporter
     let mercury: Mercury
     var mediationHandler: MediatorHandler?
 
@@ -62,7 +62,7 @@ public class PrismAgent {
         apollo: Apollo & KeyRestoration,
         castor: Castor,
         pluto: Pluto,
-        pollux: Pollux,
+        pollux: Pollux & CredentialImporter,
         mercury: Mercury,
         mediationHandler: MediatorHandler? = nil,
         seed: Seed? = nil

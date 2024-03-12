@@ -27,6 +27,12 @@ public enum PrismAgentError: KnownPrismError {
     /// An error case representing that a mediation request has failed.
     case mediationRequestFailedError(underlyingErrors: [Error]?)
 
+    /// An error case representing that a key requires to conform to the Exportable protocol.
+    case keyIsNotExportable
+
+    /// An error case representing that the wallet was not initialized and a Link secret is not set yet.
+    case noLinkSecretConfigured
+
     /// The error code returned by the server.
     public var code: Int {
         switch self {
@@ -42,6 +48,10 @@ public enum PrismAgentError: KnownPrismError {
             return 115
         case .mediationRequestFailedError:
             return 116
+        case .keyIsNotExportable:
+            return 117
+        case .noLinkSecretConfigured:
+            return 118
         }
     }
 
@@ -76,6 +86,12 @@ You need to provide a mediation handler and start the prism agent before doing s
                 .joined(separator: ", ")
             let message = errorsMessages.map { "Errors: " + $0 } ?? ""
             return "Something failed while trying to achieve mediation. \(message)"
+
+        case .keyIsNotExportable:
+            return "The key requires to conform to the Exportable protocol"
+
+        case .noLinkSecretConfigured:
+            return "The link secret was not initialized, please run start() once"
         }
     }
 }

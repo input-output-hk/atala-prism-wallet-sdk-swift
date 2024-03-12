@@ -6,7 +6,11 @@ extension CDMessageDAO: MessageStore {
     func addMessages(messages: [(Message, Message.Direction)]) -> AnyPublisher<Void, Error> {
         messages
             .publisher
-            .flatMap { self.addMessage(msg: $0.0, direction: $0.1) }
+            .flatMap {
+                self.addMessage(msg: $0.0, direction: $0.1)
+            }
+            .collect()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 

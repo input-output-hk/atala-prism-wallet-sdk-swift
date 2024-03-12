@@ -8,7 +8,7 @@ public struct PolluxBuilder {
         self.pluto = pluto
     }
 
-    public func build() -> Pollux {
+    public func build() -> Pollux & CredentialImporter {
         PolluxImpl(pluto: pluto)
     }
 }

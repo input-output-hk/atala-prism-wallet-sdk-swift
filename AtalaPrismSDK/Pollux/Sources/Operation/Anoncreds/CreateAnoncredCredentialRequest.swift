@@ -37,7 +37,7 @@ struct CreateAnoncredCredentialRequest {
         pluto: Pluto
     ) async throws -> String {
         let linkSecretObj = try LinkSecret.newFromValue(valueString: linkSecret)
-        let offer = try CredentialOffer(jsonString: String(data: offerData, encoding: .utf8)!)
+        let offer = try CredentialOffer(jsonString: offerData.tryToString())
         let credDefId = offer.getCredDefId()
         
         let credentialDefinitionData = try await credentialDefinitionDownloader.downloadFromEndpoint(urlOrDID: credDefId)

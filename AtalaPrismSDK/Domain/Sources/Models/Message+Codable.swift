@@ -15,6 +15,7 @@ extension Message: Codable {
         case pthid
         case ack
         case body
+        case direction
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -32,6 +33,7 @@ extension Message: Codable {
         try fromPrior.map { try container.encode($0, forKey: .fromPrior) }
         try thid.map { try container.encode($0, forKey: .thid) }
         try pthid.map { try container.encode($0, forKey: .pthid) }
+        try container.encode(direction, forKey: .direction)
     }
 
     public init(from decoder: Decoder) throws {
@@ -49,6 +51,7 @@ extension Message: Codable {
         let fromPrior = try? container.decodeIfPresent(String.self, forKey: .fromPrior)
         let thid = try? container.decodeIfPresent(String.self, forKey: .thid)
         let pthid = try? container.decodeIfPresent(String.self, forKey: .pthid)
+        let direction = try? container.decodeIfPresent(Direction.self, forKey: .direction)
 
         self.init(
             id: id,
@@ -63,7 +66,8 @@ extension Message: Codable {
             attachments: attachments ?? [],
             thid: thid,
             pthid: pthid,
-            ack: ack ?? []
+            ack: ack ?? [],
+            direction: direction ?? .received
         )
     }
 }
