@@ -20,12 +20,18 @@ final class Main2RouterImpl: Main2ViewRouter {
                 castor: castor
             )
         ).build()
+
+        let mnemonics = ["pig", "fork", "educate", "gun", "entire", "scatter", "satoshi", "laugh", "project", "buffalo", "race", "enroll", "shiver", "theme", "similar", "thought", "prepare", "velvet", "wild", "mention", "jelly", "match", "document", "rapid"]
+
+        let seed = try! apollo.createSeed(mnemonics: mnemonics, passphrase: "")
+
         let agent = PrismAgent(
             apollo: apollo,
             castor: castor,
             pluto: pluto,
             pollux: pollux,
-            mercury: mercury
+            mercury: mercury,
+            seed: seed
         )
         container.register(type: Apollo.self, component: apollo)
         container.register(type: Castor.self, component: castor)
@@ -60,7 +66,10 @@ final class Main2RouterImpl: Main2ViewRouter {
             agent: container.resolve(type: PrismAgent.self)!
         )
 
-        return ConnectionsListView(viewModel: viewModel)
+        return ConnectionsListView(
+            router: ConnectionsListRouterImpl(container: container),
+            viewModel: viewModel
+        )
     }
 
     func routeToMessages() -> some View {
@@ -76,13 +85,19 @@ final class Main2RouterImpl: Main2ViewRouter {
 
     func routeToCredentials() -> some View {
         let viewModel = CredentialListViewModelImpl(
-            agent: container.resolve(type: PrismAgent.self)!
+            agent: container.resolve(type: PrismAgent.self)!,
+            pluto: container.resolve(type: Pluto.self)!
         )
 
         return CredentialListView(
             viewModel: viewModel,
             router: CredentialListRouterImpl(container: container)
         )
+    }
+
+    func routeToSettings() -> some View {
+        let router = SettingsViewRouterImpl(container: container)
+        return SettingsView(viewModel: SettingsViewModelImpl(), router: router)
     }
 }
 

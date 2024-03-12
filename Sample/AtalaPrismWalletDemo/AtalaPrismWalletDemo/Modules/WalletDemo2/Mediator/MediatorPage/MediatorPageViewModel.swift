@@ -40,6 +40,15 @@ final class MediatorViewModelImpl: MediatorPageViewModel {
             }
             .replaceError(with: nil)
             .assign(to: &$mediator)
+
+        Task.detached { [weak self] in
+            if
+                let self,
+                let mediator = try await self.pluto.getAllMediators().map({ $0.first}).first().await()
+            {
+                self.startAgent(mediatorDID: mediator.did.string)
+            }
+        }
     }
 
     func startAgent(mediatorDID: String) {

@@ -41,7 +41,7 @@ struct MessagesListView<ViewModel: MessageListViewModel, Router: MessageListRout
             .navigationDestination(for: MessagesListViewState.Message.self) {
                 router.routeToMessageDetail(messageId: $0.id)
             }
+            .navigationTitle("My Messages")
         }
-        .navigationTitle("Messages")
     }
 }
