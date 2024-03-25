@@ -40,7 +40,7 @@ jobs:
         env:
             GITHUB_ACTOR: ${{ github.actor }}
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: xcodebuild build test -scheme "e2e-Package" -destination "platform=iOS Simulator,name=IPhone 14" -resultBundlePath e2eTests/Target/TestResults.xcresult | xcpretty
+        run: xcodebuild build test -scheme "e2e-Package" -destination "platform=iOS Simulator,name=IPhone 14" -resultBundlePath e2eTests/Target/TestResults.xcresult -skipPackagePluginValidation | xcpretty
       
       - name: Publish tests results
         uses: kishikawakatsumi/xcresulttool@v1.7.1
