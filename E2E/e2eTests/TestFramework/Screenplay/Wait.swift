@@ -15,7 +15,3 @@ class Wait {
         }
     }
 }
-
-enum TimeoutError: Error {
-    case timeoutReached
-}

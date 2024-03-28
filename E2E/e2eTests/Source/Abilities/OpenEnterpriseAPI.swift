@@ -208,7 +208,8 @@ class OpenEnterpriseAPI: Ability {
                 "issuerId": issuerId,
                 "attrNames": [
                     "name",
-                    "age"
+                    "age",
+                    "gender"
                 ]
             ]
             
@@ -244,7 +245,7 @@ class OpenEnterpriseAPI: Ability {
                 author: issuerId,
                 schemaId: "\(Config.agentUrl)/schema-registry/schemas/\(anoncredSchemaGuid)/schema",
                 signatureType: "CL",
-                supportRevocation: true
+                supportRevocation: false
             )
             
             let response = try await client!.createCredentialDefinition(body: .json(anoncredDefinition))
@@ -331,7 +332,8 @@ class OpenEnterpriseAPI: Ability {
             var claims: OpenAPIValueContainer = try OpenAPIValueContainer()
             claims.value = [
                 "name" : "automation",
-                "age" : "99"
+                "age" : "99",
+                "gender": "M"
             ]
             
             let body = Components.Schemas.CreateIssueCredentialRecordRequest(
@@ -403,9 +405,14 @@ class OpenEnterpriseAPI: Ability {
             let credentialDefinitionUrl = Config.agentUrl + "/credential-definition-registry/definitions/" + Config.anoncredDefinitionGuid + "/definition"
             let anoncredPresentationRequest = Components.Schemas.AnoncredPresentationRequestV1(
                 requested_attributes: .init(additionalProperties: [
-                    "name": .init(
-                        name: "name",
-                        restrictions: []
+                    "gender": .init(
+                        name: "gender",
+                        restrictions: [
+                            .init(additionalProperties: [
+                                "attr::gender::value": "M",
+                                "cred_def_id": credentialDefinitionUrl
+                            ])
+                        ]
                     )
                 ]),
                 requested_predicates: .init(additionalProperties: [
