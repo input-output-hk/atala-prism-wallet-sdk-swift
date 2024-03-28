@@ -61,7 +61,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -87,7 +87,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -100,7 +100,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -127,7 +127,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -167,7 +167,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -194,7 +194,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -230,7 +230,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -255,7 +255,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -269,7 +269,7 @@ class OpenEnterpriseAPI: Ability {
                     return response
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -283,7 +283,7 @@ class OpenEnterpriseAPI: Ability {
                     return response
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -298,7 +298,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -323,7 +323,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -351,7 +351,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -364,7 +364,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -395,8 +395,52 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
+        }
+        
+        func requestAnonymousPresentProof(_ connectionId: String) async throws -> Components.Schemas.PresentationStatus {
+            let credentialDefinitionUrl = Config.agentUrl + "/credential-definition-registry/definitions/" + Config.anoncredDefinitionGuid + "/definition"
+            let anoncredPresentationRequest = Components.Schemas.AnoncredPresentationRequestV1(
+                requested_attributes: .init(additionalProperties: [
+                    "name": .init(
+                        name: "name",
+                        restrictions: []
+                    )
+                ]),
+                requested_predicates: .init(additionalProperties: [
+                    "age": .init(
+                        name: "age",
+                        p_type: ">",
+                        p_value: 18,
+                        restrictions: []
+                    )
+                ]),
+                name: "proof_req_1",
+                nonce: "1103253414365527824079144",
+                version: "1.0"
+            )
+            
+            let body = Components.Schemas.RequestPresentationInput(
+                connectionId: connectionId,
+                options: nil,
+                proofs: [],
+                anoncredPresentationRequest: anoncredPresentationRequest,
+                credentialFormat: "AnonCreds"
+            )
+            
+            let response = try await client!.requestPresentation(body: .json(body))
+            
+            switch(response){
+            case .created(let createdResponse):
+                switch(createdResponse.body){
+                case .json(let body):
+                    return body
+                }
+            default:
+                throw Error.WrongResponse(response)
+            }
+            
         }
         
         func getPresentation(_ presentationId: String) async throws -> Components.Schemas.PresentationStatus {
@@ -408,12 +452,12 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
-        enum Error: Swift.Error, Equatable {
-            case WrongResponse
+        enum Error: Swift.Error {
+            case WrongResponse(_ response: Any)
         }
     }
 }
