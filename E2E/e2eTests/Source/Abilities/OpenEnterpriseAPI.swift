@@ -61,7 +61,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -87,7 +87,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -100,7 +100,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -127,7 +127,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -167,7 +167,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -194,7 +194,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -208,7 +208,8 @@ class OpenEnterpriseAPI: Ability {
                 "issuerId": issuerId,
                 "attrNames": [
                     "name",
-                    "age"
+                    "age",
+                    "gender"
                 ]
             ]
             
@@ -230,7 +231,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -244,7 +245,7 @@ class OpenEnterpriseAPI: Ability {
                 author: issuerId,
                 schemaId: "\(Config.agentUrl)/schema-registry/schemas/\(anoncredSchemaGuid)/schema",
                 signatureType: "CL",
-                supportRevocation: true
+                supportRevocation: false
             )
             
             let response = try await client!.createCredentialDefinition(body: .json(anoncredDefinition))
@@ -255,7 +256,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -269,7 +270,7 @@ class OpenEnterpriseAPI: Ability {
                     return response
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -283,7 +284,7 @@ class OpenEnterpriseAPI: Ability {
                     return response
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -298,7 +299,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -323,7 +324,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -331,7 +332,8 @@ class OpenEnterpriseAPI: Ability {
             var claims: OpenAPIValueContainer = try OpenAPIValueContainer()
             claims.value = [
                 "name" : "automation",
-                "age" : "99"
+                "age" : "99",
+                "gender": "M"
             ]
             
             let body = Components.Schemas.CreateIssueCredentialRecordRequest(
@@ -351,7 +353,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -364,7 +366,7 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -395,7 +397,55 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
+            }
+        }
+        
+        func requestAnonymousPresentProof(_ connectionId: String) async throws -> Components.Schemas.PresentationStatus {
+            let credentialDefinitionUrl = Config.agentUrl + "/credential-definition-registry/definitions/" + Config.anoncredDefinitionGuid + "/definition"
+            let anoncredPresentationRequest = Components.Schemas.AnoncredPresentationRequestV1(
+                requested_attributes: .init(additionalProperties: [
+                    "gender": .init(
+                        name: "gender",
+                        restrictions: [
+                            .init(additionalProperties: [
+                                "attr::gender::value": "M",
+                                "cred_def_id": credentialDefinitionUrl
+                            ])
+                        ]
+                    )
+                ]),
+                requested_predicates: .init(additionalProperties: [
+                    "age": .init(
+                        name: "age",
+                        p_type: ">",
+                        p_value: 18,
+                        restrictions: []
+                    )
+                ]),
+                name: "proof_req_1",
+                nonce: Utils.generateNonce(length: 25),
+                version: "1.0"
+            )
+            
+            let body = Components.Schemas.RequestPresentationInput(
+                connectionId: connectionId,
+                options: nil,
+                proofs: [],
+                anoncredPresentationRequest: anoncredPresentationRequest,
+                credentialFormat: "AnonCreds"
+            )
+            
+            let response = try await client!.requestPresentation(body: .json(body))
+            
+            switch(response){
+            case .created(let createdResponse):
+                switch(createdResponse.body){
+                case .json(let body):
+                    return body
+                }
+            default:
+                throw Error.WrongResponse(response)
             }
         }
         
@@ -408,12 +458,12 @@ class OpenEnterpriseAPI: Ability {
                     return body
                 }
             default:
-                throw Error.WrongResponse
+                throw Error.WrongResponse(response)
             }
         }
         
-        enum Error: Swift.Error, Equatable {
-            case WrongResponse
+        enum Error: Swift.Error {
+            case WrongResponse(_ response: Any)
         }
     }
 }

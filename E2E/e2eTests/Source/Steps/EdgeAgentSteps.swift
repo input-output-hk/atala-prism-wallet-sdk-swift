@@ -7,9 +7,14 @@ class EdgeAgentSteps: Steps {
         try await EdgeAgentWorkflow.presentProof(edgeAgent: edgeAgent)
     }
     
-    @Step("{actor} has {int} credentials issued by {actor}")
+    @Step("{actor} has '{int}' credentials issued by {actor}")
     var edgeAgentHasCredentialsIssuedByCloudAgent = { (edgeAgent: Actor, numberOfCredentials: Int, cloudAgent: Actor) in
         try await EdgeAgentWorkflow.hasIssuedCredentials(edgeAgent: edgeAgent, numberOfCredentialsIssued: numberOfCredentials, cloudAgent: cloudAgent)
+    }
+    
+    @Step("{actor} has '{int}' anonymous credentials issued by {actor}")
+    var edgeAgentHasAnonymousCredentialsIssuedByCloudAgent = { (edgeAgent: Actor, numberOfCredentials: Int, cloudAgent: Actor) in
+        try await EdgeAgentWorkflow.hasIssuedAnonymousCredentials(edgeAgent: edgeAgent, numberOfCredentialsIssued: numberOfCredentials, cloudAgent: cloudAgent)
     }
     
     @Step("{actor} accepts {int} credential offer sequentially from {actor}")

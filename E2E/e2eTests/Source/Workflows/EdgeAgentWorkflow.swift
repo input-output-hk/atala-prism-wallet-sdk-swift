@@ -39,6 +39,18 @@ class EdgeAgentWorkflow {
         }
     }
     
+    static func hasIssuedAnonymousCredentials(edgeAgent: Actor, numberOfCredentialsIssued: Int, cloudAgent: Actor) async throws {
+        for _ in 0..<numberOfCredentialsIssued {
+            try await CloudAgentWorkflow.offersAnonymousCredential(cloudAgent: cloudAgent)
+            try await EdgeAgentWorkflow.waitToReceiveCredentialsOffer(edgeAgent: edgeAgent, numberOfCredentials: 1)
+            try await EdgeAgentWorkflow.acceptsTheCredentialOffer(edgeAgent: edgeAgent)
+            let recordId: String = try cloudAgent.recall(key: "recordId")
+            try await CloudAgentWorkflow.verifyCredentialState(cloudAgent: cloudAgent, recordId: recordId, expectedState: .CredentialSent)
+            try await EdgeAgentWorkflow.waitToReceiveIssuedCredentials(edgeAgent: edgeAgent, numberOfCredentials: 1)
+            try await EdgeAgentWorkflow.processIssuedCredentials(edgeAgent: edgeAgent, numberOfCredentials: 1)
+        }
+    }
+    
     static func acceptsTheCredentialOffer(edgeAgent: Actor) async throws {
         let message: Message = try edgeAgent.using(
             ability: Sdk.self,

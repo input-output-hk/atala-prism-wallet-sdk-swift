@@ -10,6 +10,11 @@ class CloudAgentSteps: Steps {
     var cloudAgentAsksForPresentProof = { (cloudAgent: Actor) in
         try await CloudAgentWorkflow.asksForPresentProof(cloudAgent: cloudAgent)
     }
+
+    @Step("{actor} asks for anonymous present-proof")
+    var cloudAgentAsksForAnonymousPresentProof = { (cloudAgent: Actor) in
+        try await CloudAgentWorkflow.asksForAnonymousPresentProof(cloudAgent: cloudAgent)
+    }
     
     @Step("{actor} should see the present-proof is verified")
     var cloudAgentShouldSeeThePresentProofIsVerified = { (cloudAgent: Actor) in
