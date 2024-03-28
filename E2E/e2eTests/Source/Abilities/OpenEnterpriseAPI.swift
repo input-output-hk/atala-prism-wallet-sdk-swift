@@ -424,7 +424,7 @@ class OpenEnterpriseAPI: Ability {
                     )
                 ]),
                 name: "proof_req_1",
-                nonce: "1103253414365527824079144",
+                nonce: Utils.generateNonce(length: 25),
                 version: "1.0"
             )
             
@@ -447,7 +447,6 @@ class OpenEnterpriseAPI: Ability {
             default:
                 throw Error.WrongResponse(response)
             }
-            
         }
         
         func getPresentation(_ presentationId: String) async throws -> Components.Schemas.PresentationStatus {
