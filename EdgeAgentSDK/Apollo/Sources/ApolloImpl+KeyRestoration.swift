@@ -15,26 +15,37 @@ extension ApolloImpl: KeyRestoration {
     }
 
     public func restorePrivateKey(_ key: StorableKey) throws -> PrivateKey {
+        let derivationPath: DerivationPath?
+        if let derivationStr = key.queryDerivationPath {
+            derivationPath = try DerivationPath(string: derivationStr)
+        } else if let index = key.index {
+            derivationPath = DerivationPath(index: index)
+        } else {
+            derivationPath = nil
+        }
         switch  key.restorationIdentifier {
         case "secp256k1+priv":
-            guard let index = key.index else {
+            guard let derivationPath else {
                 throw ApolloError.restoratonFailedNoIdentifierOrInvalid
             }
             return Secp256k1PrivateKey(
                 identifier: key.identifier,
-                internalKey: .init(raw: key.storableData.toKotlinByteArray()), derivationPath: DerivationPath(index: index)
+                internalKey: .init(raw: key.storableData.toKotlinByteArray()),
+                derivationPath: derivationPath
             )
         case "x25519+priv":
             return try CreateX25519KeyPairOperation(logger: Self.logger)
                 .compute(
                     identifier: key.identifier,
-                    fromPrivateKey: key.storableData
+                    fromPrivateKey: key.storableData,
+                    derivationPath: derivationPath
                 )
         case "ed25519+priv":
             return try CreateEd25519KeyPairOperation(logger: Self.logger)
                 .compute(
                     identifier: key.identifier,
-                    fromPrivateKey: key.storableData
+                    fromPrivateKey: key.storableData,
+                    derivationPath: derivationPath
                 )
         default:
             throw ApolloError.restoratonFailedNoIdentifierOrInvalid
@@ -65,26 +76,37 @@ extension ApolloImpl: KeyRestoration {
     }
 
     public func restoreKey(_ key: StorableKey) async throws -> Key {
+        let derivationPath: DerivationPath?
+        if let derivationStr = key.queryDerivationPath {
+            derivationPath = try DerivationPath(string: derivationStr)
+        } else if let index = key.index {
+            derivationPath = DerivationPath(index: index)
+        } else {
+            derivationPath = nil
+        }
         switch key.restorationIdentifier {
         case "secp256k1+priv":
-            guard let index = key.index else {
+            guard let derivationPath else {
                 throw ApolloError.restoratonFailedNoIdentifierOrInvalid
             }
             return Secp256k1PrivateKey(
                 identifier: key.identifier,
-                internalKey: .init(raw: key.storableData.toKotlinByteArray()), derivationPath: DerivationPath(index: index)
+                internalKey: .init(raw: key.storableData.toKotlinByteArray()),
+                derivationPath: derivationPath
             )
         case "x25519+priv":
             return try CreateX25519KeyPairOperation(logger: Self.logger)
                 .compute(
                     identifier: key.identifier,
-                    fromPrivateKey: key.storableData
+                    fromPrivateKey: key.storableData,
+                    derivationPath: derivationPath
                 )
         case "ed25519+priv":
             return try CreateEd25519KeyPairOperation(logger: Self.logger)
                 .compute(
                     identifier: key.identifier,
-                    fromPrivateKey: key.storableData
+                    fromPrivateKey: key.storableData,
+                    derivationPath: derivationPath
                 )
         case "secp256k1+pub":
             return Secp256k1PublicKey(

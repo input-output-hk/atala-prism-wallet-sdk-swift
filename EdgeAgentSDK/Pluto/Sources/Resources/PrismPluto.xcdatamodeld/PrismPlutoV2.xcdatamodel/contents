@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22757" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDAvailableClaim" representedClassName="CDAvailableClaim" syncable="YES">
+        <attribute name="value" attributeType="String"/>
+        <relationship name="credential" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDCredential" inverseName="queryAvailableClaims" inverseEntity="CDCredential"/>
+    </entity>
+    <entity name="CDCredential" representedClassName="CDCredential" syncable="YES">
+        <attribute name="credentialData" attributeType="Binary"/>
+        <attribute name="queryCredentialCreated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="queryCredentialSchema" optional="YES" attributeType="String"/>
+        <attribute name="queryCredentialUpdated" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="queryIssuer" optional="YES" attributeType="String"/>
+        <attribute name="queryRevoked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="querySubject" optional="YES" attributeType="String"/>
+        <attribute name="queryValidUntil" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="recoveryId" attributeType="String"/>
+        <attribute name="storingId" attributeType="String"/>
+        <relationship name="queryAvailableClaims" toMany="YES" deletionRule="Nullify" destinationEntity="CDAvailableClaim" inverseName="credential" inverseEntity="CDAvailableClaim"/>
+    </entity>
+    <entity name="CDDatabaseKey" representedClassName="CDDatabaseKey" parentEntity="CDKey" syncable="YES">
+        <attribute name="storableData" attributeType="Binary"/>
+    </entity>
+    <entity name="CDDID" representedClassName="CDDID" isAbstract="YES" syncable="YES">
+        <attribute name="did" optional="YES" attributeType="String"/>
+        <attribute name="method" attributeType="String"/>
+        <attribute name="methodId" attributeType="String"/>
+        <attribute name="schema" attributeType="String"/>
+    </entity>
+    <entity name="CDDIDPair" representedClassName="CDDIDPair" parentEntity="CDDID" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="holderDID" maxCount="1" deletionRule="Nullify" destinationEntity="CDDIDPrivateKey" inverseName="pair" inverseEntity="CDDIDPrivateKey"/>
+        <relationship name="messages" toMany="YES" deletionRule="Nullify" destinationEntity="CDMessage" inverseName="pair" inverseEntity="CDMessage"/>
+    </entity>
+    <entity name="CDDIDPrivateKey" representedClassName="CDDIDPrivateKey" parentEntity="CDDID" syncable="YES">
+        <attribute name="alias" optional="YES" attributeType="String"/>
+        <relationship name="keys" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDKey" inverseName="did" inverseEntity="CDKey"/>
+        <relationship name="pair" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDDIDPair" inverseName="holderDID" inverseEntity="CDDIDPair"/>
+    </entity>
+    <entity name="CDKey" representedClassName="CDKey" isAbstract="YES" syncable="YES">
+        <attribute name="derivationPath" optional="YES" attributeType="String"/>
+        <attribute name="identifier" attributeType="String"/>
+        <attribute name="index" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="restorationIdentifier" attributeType="String"/>
+        <relationship name="did" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDDIDPrivateKey" inverseName="keys" inverseEntity="CDDIDPrivateKey"/>
+    </entity>
+    <entity name="CDKeychainKey" representedClassName="CDKeychainKey" parentEntity="CDKey" syncable="YES">
+        <attribute name="algorithm" attributeType="String"/>
+        <attribute name="service" attributeType="String"/>
+        <attribute name="tag" optional="YES" attributeType="String"/>
+        <attribute name="type" attributeType="String"/>
+        <relationship name="pair" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDKeychainKey" inverseName="pair" inverseEntity="CDKeychainKey"/>
+    </entity>
+    <entity name="CDMediatorDID" representedClassName="CDMediatorDID" syncable="YES">
+        <attribute name="mediatorId" optional="YES" attributeType="String"/>
+        <relationship name="mediatorDID" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDDID"/>
+        <relationship name="peerDID" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDDIDPrivateKey"/>
+        <relationship name="routingDID" maxCount="1" deletionRule="Nullify" destinationEntity="CDDID"/>
+    </entity>
+    <entity name="CDMessage" representedClassName="CDMessage" syncable="YES">
+        <attribute name="createdTime" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dataJson" attributeType="Binary"/>
+        <attribute name="direction" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="from" optional="YES" attributeType="String"/>
+        <attribute name="messageId" attributeType="String"/>
+        <attribute name="thid" optional="YES" attributeType="String"/>
+        <attribute name="to" optional="YES" attributeType="String"/>
+        <attribute name="type" attributeType="String"/>
+        <relationship name="pair" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDDIDPair" inverseName="messages" inverseEntity="CDDIDPair"/>
+    </entity>
+    <entity name="CDProofProtocol" representedClassName="CDProofProtocol" syncable="YES">
+        <attribute name="protocolId" optional="YES" attributeType="String"/>
+        <attribute name="threadId" optional="YES" attributeType="String"/>
+        <relationship name="presentation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDMessage"/>
+        <relationship name="propose" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDMessage"/>
+        <relationship name="request" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDMessage"/>
+    </entity>
+    <entity name="CDRegisteredDID" representedClassName="CDRegisteredDID" parentEntity="CDDID" syncable="YES">
+        <attribute name="alias" optional="YES" attributeType="String"/>
+        <attribute name="keyIndex" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="NO"/>
+    </entity>
+</model>

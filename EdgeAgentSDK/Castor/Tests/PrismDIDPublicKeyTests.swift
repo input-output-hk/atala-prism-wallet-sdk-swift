@@ -16,7 +16,7 @@ final class PrismDIDPublicKeyTests: XCTestCase {
             KeyProperties.type.rawValue: "EC",
             KeyProperties.curve.rawValue: KnownKeyCurves.secp256k1.rawValue,
             KeyProperties.seed.rawValue: seed.value.base64Encoded(),
-            KeyProperties.derivationPath.rawValue: DerivationPath(index: 0).keyPathString()
+            KeyProperties.derivationPath.rawValue: DerivationPath().keyPathString()
         ])
     }
 

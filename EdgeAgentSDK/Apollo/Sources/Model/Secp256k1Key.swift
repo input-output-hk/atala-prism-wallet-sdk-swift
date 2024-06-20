@@ -57,6 +57,7 @@ extension Secp256k1PrivateKey: KeychainStorableKey {
     var restorationIdentifier: String { "secp256k1+priv" }
     var storableData: Data { raw }
     var index: Int? { derivationPath.index }
+    var queryDerivationPath: String? { derivationPath.keyPathString() }
     var type: Domain.KeychainStorableKeyProperties.KeyAlgorithm { .rawKey }
     var keyClass: Domain.KeychainStorableKeyProperties.KeyType { .privateKey }
     var accessiblity: Domain.KeychainStorableKeyProperties.Accessability? { .firstUnlock(deviceOnly: true) }
@@ -112,6 +113,7 @@ extension Secp256k1PublicKey: KeychainStorableKey {
     var restorationIdentifier: String { "secp256k1+pub" }
     var storableData: Data { raw }
     var index: Int? { nil }
+    var queryDerivationPath: String? { nil }
     var type: Domain.KeychainStorableKeyProperties.KeyAlgorithm { .rawKey }
     var keyClass: Domain.KeychainStorableKeyProperties.KeyType { .publicKey }
     var accessiblity: Domain.KeychainStorableKeyProperties.Accessability? { .firstUnlock(deviceOnly: true) }

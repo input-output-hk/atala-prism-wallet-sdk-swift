@@ -12,10 +12,15 @@ struct CreateEd25519KeyPairOperation {
 
     }
 
-    func compute(identifier: String = UUID().uuidString, fromPrivateKey: Data) throws -> PrivateKey {
+    func compute(
+        identifier: String = UUID().uuidString,
+        fromPrivateKey: Data,
+        derivationPath: Domain.DerivationPath? = nil
+    ) throws -> PrivateKey {
         return Ed25519PrivateKey(
             identifier: identifier,
-            internalKey: KMMEdPrivateKey(raw: fromPrivateKey.toKotlinByteArray())
+            internalKey: KMMEdPrivateKey(raw: fromPrivateKey.toKotlinByteArray()),
+            derivationPath: derivationPath
         )
     }
 
@@ -27,6 +32,9 @@ struct CreateEd25519KeyPairOperation {
             .derive(path: keyPath.keyPathString()
         )
 
-        return Ed25519PrivateKey(internalKey: .init(raw: derivedHdKey.privateKey))
+        return Ed25519PrivateKey(
+            internalKey: .init(raw: derivedHdKey.privateKey),
+            derivationPath: keyPath
+        )
     }
 }

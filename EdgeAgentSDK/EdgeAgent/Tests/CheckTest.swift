@@ -17,7 +17,7 @@ final class CheckTests: XCTestCase {
             KeyProperties.type.rawValue: "EC",
             KeyProperties.seed.rawValue: seed.seed.value.base64Encoded(),
             KeyProperties.curve.rawValue: KnownKeyCurves.secp256k1.rawValue,
-            KeyProperties.derivationPath.rawValue: DerivationPath(index: 0).keyPathString()
+            KeyProperties.derivationPath.rawValue: DerivationPath().keyPathString()
         ])
 
         let payload = try "test".tryToData()

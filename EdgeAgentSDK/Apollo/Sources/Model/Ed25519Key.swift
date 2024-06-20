@@ -6,19 +6,23 @@ import Foundation
 struct Ed25519PrivateKey: PrivateKey {
     private let internalKey: ApolloLibrary.KMMEdPrivateKey
     let keyType: String = "EC"
-    let keySpecifications: [String : String] = [
-        "curve" : "Ed25519"
-    ]
+    let keySpecifications: [String : String]
+    let derivationPath: Domain.DerivationPath?
     var identifier: String
     var size: Int { raw.count }
     var raw: Data { internalKey.raw.toData() }
 
     init(
         identifier: String = UUID().uuidString,
-        internalKey: ApolloLibrary.KMMEdPrivateKey
+        internalKey: ApolloLibrary.KMMEdPrivateKey,
+        derivationPath: Domain.DerivationPath? = nil
     ) {
         self.identifier = identifier
         self.internalKey = internalKey
+        var keySpecifications = ["curve" : "Ed25519"]
+        derivationPath.map { keySpecifications[KeyProperties.derivationPath.rawValue] = $0.keyPathString() }
+        self.keySpecifications = keySpecifications
+        self.derivationPath = derivationPath
     }
 
     func publicKey() -> PublicKey {
@@ -46,6 +50,7 @@ extension Ed25519PrivateKey: KeychainStorableKey {
     var restorationIdentifier: String { "ed25519+priv" }
     var storableData: Data { raw }
     var index: Int? { nil }
+    var queryDerivationPath: String? { derivationPath?.keyPathString() }
     var type: Domain.KeychainStorableKeyProperties.KeyAlgorithm { .rawKey }
     var keyClass: Domain.KeychainStorableKeyProperties.KeyType { .privateKey }
     var accessiblity: Domain.KeychainStorableKeyProperties.Accessability? { .firstUnlock(deviceOnly: true) }
@@ -83,6 +88,7 @@ extension Ed25519PublicKey: KeychainStorableKey {
     var restorationIdentifier: String { "ed25519+pub" }
     var storableData: Data { raw }
     var index: Int? { nil }
+    var queryDerivationPath: String? { nil }
     var type: Domain.KeychainStorableKeyProperties.KeyAlgorithm { .rawKey }
     var keyClass: Domain.KeychainStorableKeyProperties.KeyType { .publicKey }
     var accessiblity: Domain.KeychainStorableKeyProperties.Accessability? { .firstUnlock(deviceOnly: true) }

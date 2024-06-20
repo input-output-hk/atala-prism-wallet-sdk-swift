@@ -41,6 +41,7 @@ extension LinkSecret: KeychainStorableKey {
     var restorationIdentifier: String { "linkSecret+key" }
     var storableData: Data { raw }
     var index: Int? { nil }
+    var queryDerivationPath: String? { nil }
     var type: Domain.KeychainStorableKeyProperties.KeyAlgorithm { .rawKey }
     var keyClass: Domain.KeychainStorableKeyProperties.KeyType { .privateKey }
     var accessiblity: Domain.KeychainStorableKeyProperties.Accessability? { .firstUnlock(deviceOnly: true) }

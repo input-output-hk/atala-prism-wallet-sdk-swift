@@ -60,7 +60,9 @@ extension ApolloImpl: Apollo {
                 if
                     let keyData = parameters[KeyProperties.rawKey.rawValue].flatMap({ Data(base64Encoded: $0) })
                 {
-                    let derivationPath = try parameters[KeyProperties.derivationPath.rawValue].map { try DerivationPath(string: $0) } ?? DerivationPath(index:0)
+                    let derivationPath = try parameters[KeyProperties.derivationPath.rawValue].map {
+                        try DerivationPath(string: $0)
+                    } ?? DerivationPath()
                     return Secp256k1PrivateKey(raw: keyData, derivationPath: derivationPath)
                 } else {
                     guard

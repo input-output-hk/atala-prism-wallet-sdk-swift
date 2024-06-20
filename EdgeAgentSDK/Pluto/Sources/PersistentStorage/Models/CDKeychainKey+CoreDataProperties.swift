@@ -10,5 +10,4 @@ extension CDKeychainKey {
     @NSManaged var service: String
     @NSManaged var type: String
     @NSManaged var algorithm: String
-
 }
