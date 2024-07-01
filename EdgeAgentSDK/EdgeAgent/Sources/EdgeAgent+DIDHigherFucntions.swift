@@ -80,7 +80,10 @@ Could not find key in storage please use Castor instead and provide the private 
             KeyProperties.type.rawValue: "EC",
             KeyProperties.seed.rawValue: seed.value.base64Encoded(),
             KeyProperties.curve.rawValue: KnownKeyCurves.secp256k1.rawValue,
-            KeyProperties.derivationPath.rawValue: DerivationPath(index: index).keyPathString()
+            KeyProperties.derivationPath.rawValue: EdgeAgentDerivationPath(
+                keyPurpose: .master,
+                keyIndex: index
+            ).derivationPath.keyPathString()
         ])
 
         let newDID = try castor.createPrismDID(masterPublicKey: privateKey.publicKey(), services: services)

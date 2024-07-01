@@ -8,6 +8,7 @@ struct MockPrivateKey: PrivateKey, StorableKey, Equatable {
     let raw: Data
     var identifier = "TestMockPrivKey"
     var index: Int? = 0
+    var queryDerivationPath: String? = nil
 
     let restorationIdentifier = "MockPrivate"
     var storableData: Data { raw }

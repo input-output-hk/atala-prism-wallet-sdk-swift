@@ -72,7 +72,7 @@ extension EdgeAgent {
             KeyProperties.type.rawValue: "EC",
             KeyProperties.curve.rawValue: KnownKeyCurves.x25519.rawValue,
             KeyProperties.seed.rawValue: seed.value.base64Encoded(),
-            KeyProperties.derivationPath.rawValue: DerivationPath(index: 0).keyPathString()
+            KeyProperties.derivationPath.rawValue: DerivationPath().keyPathString()
         ])
 
         guard let exporting = masterKey.exporting else {
@@ -109,7 +109,7 @@ extension EdgeAgent {
             KeyProperties.type.rawValue: "EC",
             KeyProperties.curve.rawValue: KnownKeyCurves.x25519.rawValue,
             KeyProperties.seed.rawValue: seed.value.base64Encoded(),
-            KeyProperties.derivationPath.rawValue: DerivationPath(index: 0).keyPathString()
+            KeyProperties.derivationPath.rawValue: DerivationPath().keyPathString()
         ])
 
         guard let exporting = masterKey.exporting else {
@@ -258,6 +258,7 @@ extension EdgeAgent {
         struct LinkSecretStorableKey: StorableKey {
             var identifier = "linkSecret"
             let index: Int? = nil
+            let queryDerivationPath: String? = nil
             let storableData: Data
             let restorationIdentifier = "linkSecret+key"
         }

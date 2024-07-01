@@ -54,14 +54,16 @@ extension CDKey {
                 identifier: keychainKey.identifier,
                 restorationIdentifier: keychainKey.restorationIdentifier,
                 storableData: keyData,
-                index: keychainKey.index?.intValue
+                index: keychainKey.index?.intValue, 
+                queryDerivationPath: keychainKey.derivationPath
             )
         case let databaseKey as CDDatabaseKey:
             return StorableKeyModel(
                 identifier: databaseKey.identifier,
                 restorationIdentifier: databaseKey.restorationIdentifier,
                 storableData: databaseKey.storableData,
-                index: databaseKey.index?.intValue
+                index: databaseKey.index?.intValue,
+                queryDerivationPath: databaseKey.derivationPath
             )
         default:
             throw UnknownError.somethingWentWrongError(

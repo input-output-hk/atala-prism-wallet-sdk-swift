@@ -13,11 +13,16 @@ struct CreateX25519KeyPairOperation {
 
     }
 
-    func compute(identifier: String = UUID().uuidString, fromPrivateKey: Data) throws -> PrivateKey {
+    func compute(
+        identifier: String = UUID().uuidString,
+        fromPrivateKey: Data,
+        derivationPath: Domain.DerivationPath? = nil
+    ) throws -> PrivateKey {
         let privateKey = KMMX25519PrivateKey(raw: fromPrivateKey.toKotlinByteArray())
         return X25519PrivateKey(
             identifier: identifier,
-            internalKey: privateKey
+            internalKey: privateKey,
+            derivationPath: derivationPath
         )
     }
 
@@ -29,6 +34,9 @@ struct CreateX25519KeyPairOperation {
             .derive(path: keyPath.keyPathString()
         )
 
-        return X25519PrivateKey(internalKey: KMMEdPrivateKey(raw: derivedHdKey.privateKey).x25519PrivateKey())
+        return X25519PrivateKey(
+            internalKey: KMMEdPrivateKey(raw: derivedHdKey.privateKey).x25519PrivateKey(),
+            derivationPath: keyPath
+        )
     }
 }

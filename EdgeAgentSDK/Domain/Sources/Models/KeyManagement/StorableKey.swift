@@ -12,7 +12,11 @@ public protocol StorableKey {
     var storableData: Data { get }
     
     /// Indexation of the key is useful to keep track of a derivation index
+    @available(*, deprecated, renamed: "derivationPath", message: "Use derivationPath instead this property will be removed on a future version")
     var index: Int? { get }
+
+    /// Derivation path used for this key is useful to keep track of a derivation index
+    var queryDerivationPath: String? { get }
 }
 
 /// Extension of the `Key` protocol to provide additional functionality related to storage.
