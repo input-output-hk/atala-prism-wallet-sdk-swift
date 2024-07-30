@@ -7,17 +7,22 @@ class OpenEnterpriseAPI: Ability {
     lazy var actor: Actor = {
         return actor
     }()
-    let abilityName: String = "OEA API"
-    var isInitialized: Bool = true
+    let abilityName: String = "identus cloud-agent api"
+    var isInitialized: Bool = false
     
     private lazy var transport: URLSessionTransport = { return transport }()
     private lazy var client: Client = { return client }()
     
     required init() {}
     
-    func setUp(_ actor: Actor) async throws {
+    func initialize() async throws {
         self.actor = actor
         createClient(StepReporterMiddleware(actor.name))
+        isInitialized = true
+    }
+    
+    func setActor(_ actor: Actor) {
+        self.actor = actor
     }
     
     func createClient(_ middlewares: ClientMiddleware...) {
@@ -28,8 +33,6 @@ class OpenEnterpriseAPI: Ability {
             transport: transport,
             middlewares: [APITokenMiddleware(apikey: Config.apiKey)] + middlewares
         )
-        
-        isInitialized = true
     }
     
     func tearDown() async throws {
@@ -461,7 +464,7 @@ class OpenEnterpriseAPI: Ability {
     func revokeCredential(_ recordId: String) async throws -> Int {
         let response = try await client.patchCredential_hyphen_statusRevoke_hyphen_credentialId(path: .init(id: recordId))
         switch(response) {
-        case .ok(let okResponse):
+        case .ok(_):
             return 200
         default:
             throw Error.WrongResponse(response)

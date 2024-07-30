@@ -7,7 +7,7 @@ final class JwtRevocationFeature: Feature {
         "Edge Agent should be notified when Cloud Agent revokes a credential"
     }
     
-    func testReceiveOneCredential() async throws {
+    func testRevocationNotification() async throws {
         currentScenario = Scenario("Revoke one verifiable credential")
             .given("Cloud Agent is connected to Edge Agent")
             .and("Edge Agent has '1' jwt credentials issued by Cloud Agent")

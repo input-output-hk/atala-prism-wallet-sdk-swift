@@ -39,7 +39,7 @@ class StepRunner {
     
     private static func createMatcher(_ stepDefinition: String) -> String {
         let sanitizedString = sanitizeString(stepDefinition)
-        return sanitizedString.replacingOccurrences(of: StepRunner.parameterPattern, with: "(.*)", options: .regularExpression)
+        return sanitizedString.replacingOccurrences(of: StepRunner.parameterPattern, with: "(.*)", options: .regularExpression) + "$"
     }
     
     private static func sanitizeString(_ stepDefinition: String) -> String {

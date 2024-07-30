@@ -29,7 +29,7 @@ struct JWTRevocationCheck {
 
     func verifyRevocationOnEncodedList(_ list: Data, index: Int) throws -> Bool {
         let encodedListData = try list.gunzipped()
-        let bitList = encodedListData.bytes.flatMap { $0.toBits() }
+        let bitList = encodedListData.flatMap { $0.toBits() }
         guard index < bitList.count else {
             throw UnknownError.somethingWentWrongError(customMessage: "Revocation index out of bounds", underlyingErrors: nil)
         }
@@ -41,7 +41,7 @@ extension UInt8 {
     func toBits() -> [Bool] {
         var bits = [Bool](repeating: false, count: 8)
         for i in 0..<8 {
-            bits[i] = (self & (1 << i)) != 0
+            bits[7-i] = (self & (1 << i)) != 0
         }
         return bits
     }

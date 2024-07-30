@@ -6,7 +6,6 @@ class TestConfiguration: ITestConfiguration {
     static var shared = { instance! }
     
     let environment: [String: String] = { readEnvironmentVariables() }()
-    private var testSuiteFinished: Bool = false
     private static var instance: ITestConfiguration? = nil
     private static var actors: [String: Actor] = [:]
     
@@ -153,17 +152,17 @@ class TestConfiguration: ITestConfiguration {
     
     func endCurrentFeature() async throws {
         try await self.afterFeature(self.currentFeatureOutcome!)
-        
-        if (testSuiteFinished) {
-            try await self.afterFeatures(self.result.featuresOutcome)
-            try await self.tearDownInstance()
-            // TODO: throw exception if it fails
-        }
     }
     
     /// signals the suite has ended
     func end() {
-        testSuiteFinished = true
+        let semaphore = DispatchSemaphore(value: 0)
+        Task.init {
+            try await self.afterFeatures(self.result.featuresOutcome)
+            try await self.tearDownInstance()
+            semaphore.signal()
+        }
+        semaphore.wait()
     }
     
     func report(_ phase: Phase, _ object: Any) async throws {
@@ -193,7 +192,6 @@ class TestConfiguration: ITestConfiguration {
         let actors = try await createActors()
         for actor in actors {
             TestConfiguration.actors[actor.name] = actor
-            try await actor.initialize()
         }
     }
     
@@ -201,6 +199,7 @@ class TestConfiguration: ITestConfiguration {
         for actor in TestConfiguration.actors.values {
             try await actor.tearDown()
         }
+        TestConfiguration.actors.removeAll()
     }
     
     private func setUpSteps() async throws {

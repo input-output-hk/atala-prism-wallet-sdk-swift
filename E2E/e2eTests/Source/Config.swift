@@ -31,7 +31,8 @@ class Config: TestConfiguration {
     override func createActors() async throws -> [Actor]  {
         let cloudAgent = Actor("Cloud Agent").whoCanUse(OpenEnterpriseAPI())
         let edgeAgent = Actor("Edge Agent").whoCanUse(UseWalletSdk())
-        return [cloudAgent, edgeAgent]
+        let verifierEdgeAgent = Actor("Verifier Edge Agent").whoCanUse(UseWalletSdk())
+        return [cloudAgent, edgeAgent, verifierEdgeAgent]
     }
 
     override func setUp() async throws {

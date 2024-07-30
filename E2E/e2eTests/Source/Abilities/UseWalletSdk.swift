@@ -20,13 +20,15 @@ class UseWalletSdk: Ability {
     lazy var actor: Actor = {
         return actor
     }()
-    let abilityName: String = "Swift SDK"
+    let abilityName: String = "edge-agent sdk"
     var isInitialized: Bool = false
     
     var credentialOfferStack: [Message] = []
     var issueCredentialStack: [Message] = []
     var proofOfRequestStack: [Message] = []
     var revocationStack: [Message] = []
+    var presentationStack: [Message] = []
+    
     var receivedMessages: [String] = []
     var cancellables = Set<AnyCancellable>()
     
@@ -36,12 +38,14 @@ class UseWalletSdk: Ability {
 
     required init() {}
     
-    func setUp(_ actor: Actor) async throws {
+    func initialize() async throws {
+        try await createSdk()
+        try await startSdk()
+        isInitialized = true
+    }
+    
+    func setActor(_ actor: Actor) {
         self.actor = actor
-        if (!isInitialized) {
-            _ = try await createSdk()
-            try await startSdk()
-        }
     }
     
     func createSdk(seed: Seed = defaultSeed) async throws {
@@ -67,7 +71,7 @@ class UseWalletSdk: Ability {
         ).build()
         
         EdgeAgent.setupLogging(logLevels: [
-            .edgeAgent: .info
+            .edgeAgent: .error
         ])
         
         sdk = EdgeAgent(
@@ -98,6 +102,7 @@ class UseWalletSdk: Ability {
                     }
                 },
                 receiveValue: { message in
+                    // FIXME: workaround for receiving multiple messages from the publisher
                     if (self.receivedMessages.contains(message.id)) {
                         return
                     }
@@ -111,8 +116,9 @@ class UseWalletSdk: Ability {
                         self.proofOfRequestStack.append(message)
                     case ProtocolTypes.didcommRevocationNotification.rawValue:
                         self.revocationStack.append(message)
+                    case ProtocolTypes.didcommPresentation.rawValue:
+                        self.presentationStack.append(message)
                     default:
-                        print("Message", message.piuri, "not part of event handler.")
                         break
                     }
                 }
@@ -120,10 +126,13 @@ class UseWalletSdk: Ability {
             .store(in: &cancellables)
         
         sdk.startFetchingMessages()
-        self.isInitialized = true
     }
     
     func tearDown() async throws {
+        if (!isInitialized) {
+            print("Actor was not initialized")
+            return
+        }
         sdk.stopFetchingMessages()
         try await sdk.stop()
     }
@@ -154,7 +163,6 @@ class UseWalletSdk: Ability {
                 withPad: "=", startingAt: 0);
         }
         return Data(base64Encoded: encoded)!
-        //        return String(data: data, encoding: .utf8)!
     }
     
     static private func createSecretsStream(

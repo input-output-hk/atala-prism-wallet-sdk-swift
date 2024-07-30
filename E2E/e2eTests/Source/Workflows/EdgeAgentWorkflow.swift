@@ -143,14 +143,14 @@ class EdgeAgentWorkflow {
             ability: UseWalletSdk.self,
             action: "make message"
         ).sdk.createPresentationForRequestProof(request: requestPresentationMessage, credential: credential!).makeMessage()
-        do {
-            _ = try await edgeAgent.using(
-                ability: UseWalletSdk.self,
-                action: "send message"
-            ).sdk.sendMessage(message: sendProofMessage)
-        } catch {
-            print("error", error)
-        }
+        _ = try await edgeAgent.using(
+            ability: UseWalletSdk.self,
+            action: "send message"
+        ).sdk.sendMessage(message: sendProofMessage)
+    }
+    
+    static func shouldNotBeAbleToCreatePresentProof(edgeAgent: Actor) async throws {
+        await assertThrows(try await presentProof(edgeAgent: edgeAgent))
     }
     
     static func createBackup(edgeAgent: Actor) async throws {
@@ -185,7 +185,9 @@ class EdgeAgentWorkflow {
     
     static func createPeerDids(edgeAgent: Actor, numberOfDids: Int) async throws {
         for _ in 0..<numberOfDids {
-            _ = try await edgeAgent.using(ability: UseWalletSdk.self, action: "creates peer did").sdk.createNewPeerDID(updateMediator: true)
+            let did: DID = try await edgeAgent.using(ability: UseWalletSdk.self, action: "creates peer did")
+                .sdk.createNewPeerDID(updateMediator: true)
+            try await edgeAgent.remember(key: "lastPeerDid", value: did)
         }
         
     }
@@ -203,6 +205,7 @@ class EdgeAgentWorkflow {
         try await walletSdk.createSdk(seed: seed)
         try await walletSdk.sdk.recoverWallet(encrypted: backup)
         try await walletSdk.startSdk()
+        walletSdk.isInitialized = true
         _ = newAgent.whoCanUse(walletSdk)
     }
     
@@ -284,5 +287,51 @@ class EdgeAgentWorkflow {
             }
         }
         assertThat(revokedRecordIdList.count, equalTo(revokedCredentials.count))
+    }
+    
+    static func initiatePresentationRequest(
+        edgeAgent: Actor,
+        credentialType: CredentialType,
+        toDid: DID,
+        claims: [ClaimFilter]
+    ) async throws {
+        let hostDid: DID = try await edgeAgent.using(ability: UseWalletSdk.self, action: "creates peer did")
+            .sdk.createNewPeerDID(updateMediator: true)
+        let request = try await edgeAgent.using(ability: UseWalletSdk.self, action: "creates verification request")
+            .sdk.initiatePresentationRequest(
+                type: credentialType,
+                fromDID: hostDid,
+                toDID: toDid,
+                claimFilters: claims
+            )
+        _ = try await edgeAgent.using(ability: UseWalletSdk.self, action: "sends verification request")
+            .sdk.sendMessage(message: request.makeMessage())
+    }
+    
+    static func waitForPresentationMessage(edgeAgent: Actor, numberOfPresentations: Int = 1) async throws {
+        try await edgeAgent.waitUsingAbility(
+            ability: UseWalletSdk.self,
+            action: "waits for presentation message"
+        ) { ability in
+            return ability.presentationStack.count == numberOfPresentations
+        }
+    }
+    
+    static func verifyPresentation(edgeAgent: Actor, expected: Bool = true) async throws {
+        let presentation = try await edgeAgent.using(ability: UseWalletSdk.self, action: "retrieves presentation message")
+            .presentationStack.removeFirst()
+        do {
+            let result = try await edgeAgent.using(ability: UseWalletSdk.self, action: "")
+                .sdk.verifyPresentation(message: presentation)
+            assertThat(result, equalTo(expected))
+        } catch PolluxError.cannotVerifyPresentationInputs {
+            
+            print("teste")
+            //              if (e.message.includes("credential is revoked")) {
+            //                assert.isTrue(expected === false)
+            //              } else {
+            //                throw e
+            //              }
+        }
     }
 }

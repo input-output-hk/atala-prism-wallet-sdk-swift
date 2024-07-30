@@ -10,18 +10,7 @@ class Actor {
     init(_ name: String) {
         self.name = name
     }
-    
-    func initialize() async throws {
-        if (isInitialized) {
-            return
-        }
-        
-        for ability in abilities.values {
-            try await ability.setUp(self)
-        }
-        self.isInitialized = true
-    }
-    
+
     func tearDown() async throws {
         for ability in abilities.values {
             try await ability.tearDown()
@@ -32,11 +21,16 @@ class Actor {
     
     func whoCanUse<T : Ability>(_ ability: T) -> Actor {
         abilities[String(describing: T.self)] = ability
+        ability.setActor(self)
         return self
     }
     
-    private func getAbility<T: Ability>(_ ability: T.Type) -> T {
-        return self.abilities[String(describing: ability.self)]! as! T
+    private func getAbility<T: Ability>(_ ability: T.Type) async throws -> T {
+        let ability = self.abilities[String(describing: ability.self)]! as! T
+        if (!ability.isInitialized) {
+            try await ability.initialize()
+        }
+        return ability
     }
     
     func using<T : Ability>(ability: T.Type,
@@ -47,7 +41,7 @@ class Actor {
             if !abilities.contains(where: { $0.key == String(describing: ability.self) }) {
                 throw ActorError.CantUseAbility("Actor [\(name)] don't have the ability to use [\(ability.self)]")
             }
-            let ability = getAbility(ability)
+            let ability = try await getAbility(ability)
             return ability
         }
     }
@@ -58,7 +52,7 @@ class Actor {
     ) async throws {
         let dummy = ability.init()
         return try await execute("\(name) waits until \(action) using \(dummy.abilityName)") {
-            let ability = getAbility(ability)
+            let ability = try await getAbility(ability)
             return try await Wait.until {
                 try await callback(ability)
             }

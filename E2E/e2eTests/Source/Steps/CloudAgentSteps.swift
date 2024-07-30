@@ -1,9 +1,15 @@
 import Foundation
 
 class CloudAgentSteps: Steps {    
-    @Step("{actor} offers an anonymous credential")
-    var cloudAgentOffersAnAnonymousCredential = { (cloudAgent: Actor) in
-        try await CloudAgentWorkflow.offersAnonymousCredential(cloudAgent: cloudAgent)
+    @Step("{actor} offers '{int}' anonymous credentials")
+    var cloudAgentOffersAnAnonymousCredential = { (cloudAgent: Actor, numberOfCredentials: Int) in
+        var recordIdList: [String] = []
+        for _ in 0..<numberOfCredentials {
+            try await CloudAgentWorkflow.offersAnonymousCredential(cloudAgent: cloudAgent)
+            let recordId: String = try await cloudAgent.recall(key: "recordId")
+            recordIdList.append(recordId)
+        }
+        try await cloudAgent.remember(key: "recordIdList", value: recordIdList)
     }
     
     @Step("{actor} asks for present-proof")

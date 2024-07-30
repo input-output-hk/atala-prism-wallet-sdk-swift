@@ -20,16 +20,18 @@ class Feature: XCTestCase {
     override func tearDown() async throws {
         try await run()
         try await super.tearDown()
-        if (Feature.scenarioEnd) {
-            try await TestConfiguration.shared().endCurrentFeature()
-        }
     }
 
     override class func tearDown() {
-        // signal end of feature
-        scenarioEnd = true
+        let semaphore = DispatchSemaphore(value: 0)
+        Task.init {
+            try await TestConfiguration.shared().endCurrentFeature()
+            semaphore.signal()
+        }
+        semaphore.wait()
+        super.tearDown()
     }
-    
+
     func run() async throws {
         // check if we have the scenario
         if (currentScenario == nil) {

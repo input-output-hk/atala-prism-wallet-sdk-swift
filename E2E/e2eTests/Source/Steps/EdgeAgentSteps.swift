@@ -1,10 +1,17 @@
 import Foundation
+import Domain
 
 class EdgeAgentSteps: Steps {
     @Step("{actor} sends the present-proof")
     var edgeAgentSendsThePresentProof = { (edgeAgent: Actor) in
         try await EdgeAgentWorkflow.waitForProofRequest(edgeAgent: edgeAgent)
         try await EdgeAgentWorkflow.presentProof(edgeAgent: edgeAgent)
+    }
+    
+    @Step("{actor} should not be able to create the present-proof")
+    var edgeAgentShouldNotBeAbleToCreatePresentationProof = { (edgeAgent: Actor) in
+        try await EdgeAgentWorkflow.waitForProofRequest(edgeAgent: edgeAgent)
+        try await EdgeAgentWorkflow.shouldNotBeAbleToCreatePresentProof(edgeAgent: edgeAgent)
     }
     
     @Step("{actor} has '{int}' jwt credentials issued by {actor}")
@@ -126,5 +133,68 @@ class EdgeAgentSteps: Steps {
             edgeAgent: edgeAgent,
             revokedRecordIdList: revokedRecordIdList
         )
+    }
+    
+    @Step("{actor} requests {actor} to verify the JWT credential")
+    var verifierAgentRequestsEdgeAgentToVerifyTheJwtCredential = { (verifierEdgeAgent: Actor, edgeAgent: Actor) in
+        try await EdgeAgentWorkflow.createPeerDids(edgeAgent: edgeAgent, numberOfDids: 1)
+        let did: DID = try await edgeAgent.recall(key: "lastPeerDid")
+        let claims: [ClaimFilter] = [
+            .init(paths: ["$.vc.credentialSubject.automation-required"], type: "string", pattern: "required value")
+        ]
+
+        try await EdgeAgentWorkflow.initiatePresentationRequest(
+            edgeAgent: verifierEdgeAgent,
+            credentialType: CredentialType.jwt,
+            toDid: did,
+            claims: claims
+        )
+    }
+    
+    @Step("{actor} will request {actor} to verify the anonymous credential")
+    var verifierAgentRequestsEdgeAgentToVerifyTheAnoncred = { (verifierEdgeAgent: Actor, edgeAgent: Actor) in
+        try await EdgeAgentWorkflow.createPeerDids(edgeAgent: edgeAgent, numberOfDids: 1)
+        let did: DID = try await edgeAgent.recall(key: "lastPeerDid")
+        
+        let claims: [ClaimFilter] = [
+            .init(paths: [], type: "name", const: "pu"),
+            .init(paths: [], type: "age", const: "99", pattern: ">=")
+        ]
+        
+        try await EdgeAgentWorkflow.initiatePresentationRequest(
+            edgeAgent: verifierEdgeAgent,
+            credentialType: CredentialType.anoncred,
+            toDid: did,
+            claims: claims
+        )
+    }
+    
+    @Step("{actor} will request {actor} to verify the anonymous credential for age greater than actual")
+    var verifierAgentRequestsEdgeAgentToVerifyTheAnoncredForAgeGreaterThanActual = { (verifierEdgeAgent: Actor, edgeAgent: Actor) in
+        try await EdgeAgentWorkflow.createPeerDids(edgeAgent: edgeAgent, numberOfDids: 1)
+        let did: DID = try await edgeAgent.recall(key: "lastPeerDid")
+        
+        let claims: [ClaimFilter] = [
+            .init(paths: [], type: "age", const: "100", pattern: ">=")
+        ]
+        
+        try await EdgeAgentWorkflow.initiatePresentationRequest(
+            edgeAgent: verifierEdgeAgent,
+            credentialType: CredentialType.anoncred,
+            toDid: did,
+            claims: claims
+        )
+    }
+
+    @Step("{actor} should see the verification proof is verified")
+    var verifierEdgeAgentShouldSeeTheVerificationProofIsVerified = { (verifierEdgeAgent: Actor) in
+        try await EdgeAgentWorkflow.waitForPresentationMessage(edgeAgent: verifierEdgeAgent)
+        try await EdgeAgentWorkflow.verifyPresentation(edgeAgent: verifierEdgeAgent)
+    }
+    
+    @Step("{actor} should see the verification proof is not verified")
+    var verifierShouldSeeTheVerificationProofIsFalse = { (verifierEdgeAgent: Actor) in
+        try await EdgeAgentWorkflow.waitForPresentationMessage(edgeAgent: verifierEdgeAgent)
+        try await EdgeAgentWorkflow.verifyPresentation(edgeAgent: verifierEdgeAgent, expected: false)
     }
 }
