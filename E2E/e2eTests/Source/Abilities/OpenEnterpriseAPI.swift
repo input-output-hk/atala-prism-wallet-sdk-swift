@@ -448,6 +448,47 @@ class OpenEnterpriseAPI: Ability {
         }
     }
     
+    func requestAnonymousPresentProofWithUnexpectedAttributes(_ connectionId: String) async throws -> Components.Schemas.PresentationStatus {
+        let credentialDefinitionUrl = Config.agentUrl + "/credential-definition-registry/definitions/" + Config.anoncredDefinitionGuid + "/definition"
+        let anoncredPresentationRequest = Components.Schemas.AnoncredPresentationRequestV1(
+            requested_attributes: .init(additionalProperties: [
+                "driversLicense": .init(
+                    name: "driversLicense",
+                    restrictions: [
+                        .init(additionalProperties: [
+                            "attr::driversLicense::value": "B",
+                            "cred_def_id": credentialDefinitionUrl
+                        ])
+                    ]
+                )
+            ]),
+            requested_predicates: .init(additionalProperties: [:]),
+            name: "proof_req_1",
+            nonce: Utils.generateNonce(length: 25),
+            version: "1.0"
+        )
+        
+        let body = Components.Schemas.RequestPresentationInput(
+            connectionId: connectionId,
+            options: nil,
+            proofs: [],
+            anoncredPresentationRequest: anoncredPresentationRequest,
+            credentialFormat: "AnonCreds"
+        )
+        
+        let response = try await client.requestPresentation(body: .json(body))
+        
+        switch(response){
+        case .created(let createdResponse):
+            switch(createdResponse.body){
+            case .json(let body):
+                return body
+            }
+        default:
+            throw Error.WrongResponse(response)
+        }
+    }
+    
     func getPresentation(_ presentationId: String) async throws -> Components.Schemas.PresentationStatus {
         let response = try await client.getPresentation(path: .init(presentationId: presentationId))
         switch(response){

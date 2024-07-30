@@ -8,6 +8,12 @@ class EdgeAgentSteps: Steps {
         try await EdgeAgentWorkflow.presentProof(edgeAgent: edgeAgent)
     }
     
+    @Step("{actor} should receive an exception when trying to use a wrong anoncred credential")
+    var edgeAgentShouldReceiveAnExceptionWhenTryingToUseAWrongAnoncredCredential = { (edgeAgent: Actor) in
+        try await EdgeAgentWorkflow.waitForProofRequest(edgeAgent: edgeAgent)
+        try await EdgeAgentWorkflow.tryToPresentVerificationRequestWithWrongAnoncred(edgeAgent: edgeAgent)
+    }
+    
     @Step("{actor} should not be able to create the present-proof")
     var edgeAgentShouldNotBeAbleToCreatePresentationProof = { (edgeAgent: Actor) in
         try await EdgeAgentWorkflow.waitForProofRequest(edgeAgent: edgeAgent)

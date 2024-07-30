@@ -72,6 +72,16 @@ class CloudAgentWorkflow {
         try await cloudAgent.remember(key: "presentationId", value: presentation.presentationId)
     }
     
+
+    static func asksForAnonymousPresentProofWithUnexpectedAttributes(cloudAgent: Actor) async throws {
+        let connectionId: String = try await cloudAgent.recall(key: "connectionId")
+        let presentation = try await cloudAgent.using(
+            ability: OpenEnterpriseAPI.self,
+            action: "ask an anonymous presentation proof with unexpected attributes to \(connectionId)"
+        ).requestAnonymousPresentProofWithUnexpectedAttributes(connectionId)
+        try await cloudAgent.remember(key: "presentationId", value: presentation.presentationId)
+    }
+    
     static func verifyCredentialState(cloudAgent: Actor, recordId: String, expectedState: Components.Schemas.IssueCredentialRecord.protocolStatePayload) async throws {
         try await cloudAgent.waitUsingAbility(
             ability: OpenEnterpriseAPI.self,

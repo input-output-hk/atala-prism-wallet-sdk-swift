@@ -22,6 +22,11 @@ class CloudAgentSteps: Steps {
         try await CloudAgentWorkflow.asksForAnonymousPresentProof(cloudAgent: cloudAgent)
     }
     
+    @Step("{actor} asks for anonymous present-proof with unexpected attributes")
+    var cloudAgentAsksForAnonymousPResentProofWithUnexpectedAttributes = { (cloudAgent: Actor) in
+        try await CloudAgentWorkflow.asksForAnonymousPresentProofWithUnexpectedAttributes(cloudAgent: cloudAgent)
+    }
+    
     @Step("{actor} should see the present-proof is verified")
     var cloudAgentShouldSeeThePresentProofIsVerified = { (cloudAgent: Actor) in
         try await CloudAgentWorkflow.verifyPresentProof(cloudAgent: cloudAgent, expectedState: .PresentationVerified)

@@ -130,7 +130,6 @@ class UseWalletSdk: Ability {
     
     func tearDown() async throws {
         if (!isInitialized) {
-            print("Actor was not initialized")
             return
         }
         sdk.stopFetchingMessages()

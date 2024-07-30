@@ -149,6 +149,27 @@ class EdgeAgentWorkflow {
         ).sdk.sendMessage(message: sendProofMessage)
     }
     
+    static func tryToPresentVerificationRequestWithWrongAnoncred(edgeAgent: Actor) async throws {
+        let credential = try await edgeAgent.using(
+            ability: UseWalletSdk.self,
+            action: "get a verifiable credential"
+        ).sdk.verifiableCredentials().map { $0.first }.first().await()
+        
+        let message = try await edgeAgent.using(
+            ability: UseWalletSdk.self,
+            action: "get proof request"
+        ).proofOfRequestStack.first!
+        try await edgeAgent.using(
+            ability: UseWalletSdk.self,
+            action: "remove it from list"
+        ).proofOfRequestStack.removeFirst()
+        let requestPresentationMessage = try RequestPresentation(fromMessage: message)
+        await assertThrows(try await edgeAgent.using(
+            ability: UseWalletSdk.self,
+            action: "make message"
+        ).sdk.createPresentationForRequestProof(request: requestPresentationMessage, credential: credential!).makeMessage())
+    }
+    
     static func shouldNotBeAbleToCreatePresentProof(edgeAgent: Actor) async throws {
         await assertThrows(try await presentProof(edgeAgent: edgeAgent))
     }
