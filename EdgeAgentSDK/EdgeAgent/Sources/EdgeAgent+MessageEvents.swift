@@ -26,6 +26,10 @@ public extension EdgeAgent {
                     logger.error(error: error)
                 }
                 sleep(UInt32(timeInterval))
+                
+                if (messagesStreamTask?.isCancelled == true) {
+                    break
+                }
             }
         }
     }

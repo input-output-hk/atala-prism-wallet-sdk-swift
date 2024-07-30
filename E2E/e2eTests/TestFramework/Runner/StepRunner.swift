@@ -31,7 +31,7 @@ class StepRunner {
                     actual: String(describing: actualType)
                 )
             }
-            return try await step.callback(typedInput)
+            return try await step.wrappedValue(typedInput)
         }
         self.stepMatcher = StepRunner.createMatcher(stepDefinition)
         self.parsers = StepRunner.createParsers(stepDefinition)
@@ -39,7 +39,7 @@ class StepRunner {
     
     private static func createMatcher(_ stepDefinition: String) -> String {
         let sanitizedString = sanitizeString(stepDefinition)
-        return sanitizedString.replacingOccurrences(of: StepRunner.parameterPattern, with: "(.*)", options: .regularExpression)
+        return sanitizedString.replacingOccurrences(of: StepRunner.parameterPattern, with: "(.*)", options: .regularExpression) + "$"
     }
     
     private static func sanitizeString(_ stepDefinition: String) -> String {

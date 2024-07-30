@@ -102,16 +102,13 @@ extension PolluxImpl {
         await credentials
             .asyncForEach {
                 do {
-                    guard try await verifyJWT(jwtString: $0) else {
-                        errors.append(PolluxError.invalidSignature())
-                        return
-                    }
+                    try await verifyJWT(jwtString: $0)
                 } catch {
                     errors.append(error)
                 }
             }
         guard errors.isEmpty else {
-            throw PolluxError.invalidSignature(internalErrors: errors)
+            throw PolluxError.cannotVerifyPresentationInputs(errors: errors)
         }
     }
 
@@ -142,10 +139,10 @@ extension PolluxImpl {
         }
         let isRevoked = try await credential.isRevoked
         let isSuspended = try await credential.isSuspended
-        guard isRevoked else {
+        guard !isRevoked else {
             throw PolluxError.credentialIsRevoked(jwtString: jwtString)
         }
-        guard isSuspended else {
+        guard !isSuspended else {
             throw PolluxError.credentialIsSuspended(jwtString: jwtString)
         }
     }

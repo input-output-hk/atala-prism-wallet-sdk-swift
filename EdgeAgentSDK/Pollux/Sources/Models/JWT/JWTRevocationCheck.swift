@@ -24,12 +24,12 @@ struct JWTRevocationCheck {
         let statusList = try JSONDecoder.didComm().decode(JWTRevocationStatusListCredential.self, from: listData)
         let encodedList = statusList.credentialSubject.encodedList
         let index = status.statusListIndex
-        return try verifyRevocationOnEncodedList(encodedList.tryToData(), index: index)
+        return try verifyRevocationOnEncodedList(Data(fromBase64URL: encodedList)!, index: index)
     }
 
     func verifyRevocationOnEncodedList(_ list: Data, index: Int) throws -> Bool {
         let encodedListData = try list.gunzipped()
-        let bitList = encodedListData.bytes.flatMap { $0.toBits() }
+        let bitList = encodedListData.flatMap { $0.toBits() }
         guard index < bitList.count else {
             throw UnknownError.somethingWentWrongError(customMessage: "Revocation index out of bounds", underlyingErrors: nil)
         }
@@ -41,7 +41,7 @@ extension UInt8 {
     func toBits() -> [Bool] {
         var bits = [Bool](repeating: false, count: 8)
         for i in 0..<8 {
-            bits[7 - i] = (self & (1 << i)) != 0
+            bits[7-i] = (self & (1 << i)) != 0
         }
         return bits
     }

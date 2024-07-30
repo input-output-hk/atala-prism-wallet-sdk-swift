@@ -6,15 +6,16 @@ import SwiftHamcrest
 class Feature: XCTestCase {
     let id: String = UUID().uuidString
     var currentScenario: Scenario? = nil
+    private static var scenarioEnd: Bool = false
     
     func title() -> String {
         fatalError("Set feature title")
     }
-    
+
     func description() -> String {
         return ""
     }
-
+    
     /// our lifecycle starts after xctest is ending
     override func tearDown() async throws {
         try await run()
@@ -22,10 +23,15 @@ class Feature: XCTestCase {
     }
 
     override class func tearDown() {
-        // signal end of feature
-        TestConfiguration.shared().endCurrentFeature()
+        let semaphore = DispatchSemaphore(value: 0)
+        Task.init {
+            try await TestConfiguration.shared().endCurrentFeature()
+            semaphore.signal()
+        }
+        semaphore.wait()
+        super.tearDown()
     }
-    
+
     func run() async throws {
         // check if we have the scenario
         if (currentScenario == nil) {

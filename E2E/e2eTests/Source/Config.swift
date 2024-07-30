@@ -9,6 +9,10 @@ class Config: TestConfiguration {
     static var anoncredDefinitionGuid: String = ""
     static var apiKey: String = ""
     
+    lazy var api: OpenEnterpriseAPI = {
+        return api
+    }()
+    
     override class func createInstance() -> ITestConfiguration {
         return Config()
     }
@@ -25,11 +29,12 @@ class Config: TestConfiguration {
     }
     
     override func createActors() async throws -> [Actor]  {
-        let cloudAgent = Actor("Cloud Agent").whoCanUse(OpenEnterpriseAPI.self)
-        let edgeAgent = Actor("Edge Agent").whoCanUse(Sdk.self )
-        return [cloudAgent, edgeAgent]
+        let cloudAgent = Actor("Cloud Agent").whoCanUse(OpenEnterpriseAPI())
+        let edgeAgent = Actor("Edge Agent").whoCanUse(UseWalletSdk())
+        let verifierEdgeAgent = Actor("Verifier Edge Agent").whoCanUse(UseWalletSdk())
+        return [cloudAgent, edgeAgent, verifierEdgeAgent]
     }
-    
+
     override func setUp() async throws {
         Config.mediatorOobUrl = environment["MEDIATOR_OOB_URL"]!
         Config.agentUrl = environment["PRISM_AGENT_URL"]!
@@ -37,6 +42,11 @@ class Config: TestConfiguration {
         Config.jwtSchemaGuid = environment["JWT_SCHEMA_GUID"] ?? ""
         Config.anoncredDefinitionGuid = environment["ANONCRED_DEFINITION_GUID"] ?? ""
         Config.apiKey = environment["APIKEY"] ?? ""
+        
+        // should be initialized after the configuration variables
+        let openEnterpriseApi = OpenEnterpriseAPI()
+        openEnterpriseApi.createClient()
+        self.api = openEnterpriseApi
         
         try await checkPublishedDid()
         try await checkJwtSchema()
@@ -54,7 +64,6 @@ class Config: TestConfiguration {
     }
     
     private func checkPublishedDid() async throws {
-        let api = OpenEnterpriseAPI.API()
         let isPresent = try await api.isDidPresent(Config.publishedDid)
         if (isPresent) {
             return
@@ -74,7 +83,6 @@ class Config: TestConfiguration {
     }
     
     private func checkJwtSchema() async throws {
-        let api = OpenEnterpriseAPI.API()
         let isPresent = try await api.isJwtSchemaGuidPresent(Config.jwtSchemaGuid)
         if (isPresent) {
             return
@@ -86,7 +94,6 @@ class Config: TestConfiguration {
     }
     
     private func checkAnoncredDefinition() async throws {
-        let api = OpenEnterpriseAPI.API()
         let isPresent = try await api.isAnoncredDefinitionPresent(Config.anoncredDefinitionGuid)
         if (isPresent) {
             return

@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 
-class AnoncredFeature: Feature {
+class AnoncredCredentialFeature: Feature {
     override func title() -> String {
         "Receive anonymous credential"
     }
@@ -13,11 +13,11 @@ class AnoncredFeature: Feature {
     func testReceiveOneAnoncred() async throws {
         currentScenario = Scenario("Receive one anonymous credential")
             .given("Cloud Agent is connected to Edge Agent")
-            .when("Cloud Agent offers an anonymous credential")
+            .when("Cloud Agent offers '1' anonymous credentials")
             .then("Edge Agent should receive the credential")
             .when("Edge Agent accepts the credential")
             .when("Cloud Agent should see the credential was accepted")
             .then("Edge Agent wait to receive 1 issued credentials")
-            .then("Edge Agent process 1 issued credentials")
+            .then("Edge Agent process issued credentials from Cloud Agent")
     }
 }

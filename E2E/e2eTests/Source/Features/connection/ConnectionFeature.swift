@@ -1,4 +1,3 @@
-
 final class ConnectionFeature: Feature {
     override func title() -> String {
         "Create connection"
